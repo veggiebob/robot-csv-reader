@@ -1,4 +1,8 @@
 <!DOCTYPE html>
+<!--
+    @TODO
+     - add in styles (and animations) for ID blocks (class="idblock") and their headers (class="idblockheader"), stored in <div id="robot-details">
+-->
 <html>
     <head>
         <meta charset="utf-8">
@@ -22,13 +26,16 @@
         .details {
             background-color: grey;
         }
+        .extras {
+            background-color: lightgray;
+        }
         .gui {
             color: white;
             font-family: monospace;
         }
         #draw-canvas {
             border:grey solid 2px;
-            /* Like 0 to 54 for x and 0 to 27 for y */
+            /* Like 0 to 54 for x and 0 to 27 for y -- in Luke's words*/
             width: 540*2px;
             height: 270*2px;
         }
@@ -37,6 +44,35 @@
         }
         #choose-file {
             box-shadow: 0px 0px 3px;
+        }
+        .idblock {
+            color: black;
+            font-family: monospace;
+            padding: 5px;
+            margin-bottom: 4px;
+            background-color: grey;
+            border: none;
+            border-radius: 0px 0px 4px 4px;
+        }
+        .idblockheader {
+            color:white;
+            font-size: 24px;
+            padding:3px;
+            border: none;
+            border-radius: 4px 4px 0px 0px;
+        }
+        .special-text {
+            text-shadow: 0px 0px 5px white;
+            font-weight: bold;
+        }
+        .checks {
+            box-sizing: border-box;
+        }
+        #robot-details {
+            margin-bottom: 800px;
+        }
+        #robot-details:empty {
+            height:500px;
         }
     </style>
     <body class="gui">
@@ -51,9 +87,13 @@
             <input type="file" class="gui" id="choose-file" multiple="true" accept=".csv" placeholder="choose file">
             <button type="button" id="upload">UPLOAD</button> (can be multiple CSV files)
             <br> <br> 
-            <input type="checkbox" checked="false" id="fog-toggle"> Show full path? <br>
-            <input type="checkbox" checked="true" id="nubs-toggle"> Show path nubs? <br>
-            <input type="checkbox" cheked="false" id="drops-toggle"> Show drops? (currently under construction)<br>
+            <input type="range" min="0" max="2" id="path-visibility"> Path visibility <br>
+            <input class="checks" type="checkbox" checked=true id="nubs-toggle"> Show path nubs? <br>
+            <input class="checks" type="checkbox" id="drops-toggle"> Show drops?<br>
+            <input class="checks" type="checkbox" id="robot-toggle"> Show Robot?<br>
+        </div>
+        <div class="extras common" id="robot-details">
+
         </div>
     </body>
     <script>
@@ -61,23 +101,38 @@
         var f = document.getElementById("choose-file")
         var up = document.getElementById("upload")
         var time_set = document.getElementById("time-selector")
-        var fogToggle = document.getElementById("fog-toggle"), 
+        var pathV = document.getElementById("path-visibility"), 
             nubsToggle = document.getElementById("nubs-toggle"), 
-            dropsToggle = document.getElementById("drops-toggle")
+            dropsToggle = document.getElementById("drops-toggle"),
+            robotToggle = document.getElementById("robot-toggle")
         var pressing_time = false;
         var raw_csv = [];//String[][]
-        var paths = [];//Path[]
+        var robots = [];//Robot[]
         var loaded = false;
         var numFiles = -1;
         var countCSVs = 0;
+        var robotsLoaded = false;
         const timeScale = 20;//how many available selecting points between each recorded node
         const fieldDim = {
             x: 54,
             y: 27
-        }
-        const fieldScale = 20;
+        };
+        const fieldScale = 20
+        const pi = 3.1415926535;
+
         document.getElementById("time-selector").max = 160*timeScale;
+        //trying to change the size of the canvas
+        // document.getElementById("draw-canvas").style.width = (fieldDim.x*fieldScale) + "px"
+        // document.getElementById("draw-canvas").style.height = (fieldDim.y*fieldScale) + "px"
+        document.getElementById("time-selector").style.width = (fieldDim.x*fieldScale) + "px"
+
+        f.onclick = () => {
+            up.focus();
+        }
         up.onclick = () => {
+            loaded = false;
+            robotsLoaded = false;
+            document.getElementById("robot-details").innerHTML = "";
             numFiles = f.files.length;
             for(var i = 0; i<numFiles; i++) {
                 var fr = new FileReader();
@@ -96,8 +151,9 @@
                     }
                 }
             }
-            document.getElementById("upload").focus();
         }
+
+
         time_set.onmousedown = () => pressing_time = true
         time_set.onmouseleave = () => pressing_time = false
         time_set.onmouseup = () => pressing_time = false
@@ -109,5 +165,6 @@
         }, 1000/6);//update 6 times per second
     </script>
     <script src="https://cdn.jsdelivr.net/processing.js/1.4.8/processing.min.js"></script><!-- import pjs -->
+    <script src="components.js"></script>
     <script src="pjs-render.js"></script>
 </html>
