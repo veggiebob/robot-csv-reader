@@ -217,7 +217,7 @@ var drawField = function(processingInstance) {
             }
             if(moused>0) {
                 mouseText.show();
-                mouseText.setText(`-Drop-\nx: ${clipNumber(drops[moused].x, 2)}\ny: ${clipNumber(drops[moused].y, 2)}\nt: ${drops[moused].time}`)
+                mouseText.setText(`-Drop-\nx: ${clipNumber(rawdrops[moused].x, 2)}\ny: ${clipNumber(rawdrops[moused].y, 2)}\nt: ${rawdrops[moused].time}`)
                 mouseText.setColor(washColor(col))
             }
         }
